@@ -13,7 +13,6 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
 libraryDependencies ++= {
   val akkaV = "2.4.3"
   val sprayV = "1.3.3"
-  val upickleVersion = "0.3.4"
 
   Seq(
     "com.typesafe.akka"   %% "akka-actor"               % akkaV,
@@ -35,9 +34,27 @@ libraryDependencies ++= {
   )
 }
 
+assemblyMergeStrategy in assembly := {
+  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
+  case PathList("META-INF", "CHANGES.txt")           => MergeStrategy.discard
+  case PathList("META-INF", "LICENSES.txt")          => MergeStrategy.discard
+  case "application.conf"                            => MergeStrategy.concat
+  case "unwanted.txt"                                => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
 
 assemblyJarName in assembly := s"${name.value}-${version.value}.jar"
 
-//test in assembly := {}
+val classPath = Seq(
+  "."
+)
+
+packageOptions += Package.ManifestAttributes(
+  "Class-Path" -> classPath.mkString(" ")
+)
+
+test in assembly := {}
 
 Revolver.settings

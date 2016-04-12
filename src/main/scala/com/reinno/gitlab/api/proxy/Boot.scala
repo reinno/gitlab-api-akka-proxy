@@ -11,7 +11,7 @@ import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.reinno.gitlab.api.proxy.route.ApiRouterService
 
-object Boot {
+object Boot extends App {
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("gitlab-api-proxy")
   implicit val timeout = Timeout(10 seconds)

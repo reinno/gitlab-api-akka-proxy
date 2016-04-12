@@ -2,7 +2,7 @@ package com.reinno.gitlab.api.proxy.route
 
 import akka.http.scaladsl.Http
 import akka.stream.scaladsl.{Sink, Source}
-import com.reinno.gitlab.api.proxy.util.Constants
+import com.reinno.gitlab.api.proxy.util.{LogUtil, Constants}
 
 import scala.concurrent.ExecutionContext
 
@@ -16,6 +16,8 @@ trait ApiRouter {
   implicit val ec: ExecutionContext
   implicit val mat: ActorMaterializer
   val actorSystem: ActorSystem
+  val LOG = LogUtil.getLogger(getClass)
+
   protected def prefix = Slash ~ "api" / s"${Constants.REST_VERSION}"
 
   def serviceRouters: Route = encodeResponse {
@@ -28,10 +30,10 @@ trait ApiRouter {
 
   def transportRouters: Route = {
     context =>
-      val request = context.request
-      println("Opening connection to " + request.uri.authority.host.address)
-      val flow = Http(actorSystem).outgoingConnectionHttps("www.gitlab.com")
-      Source.single(context.request.withUri(request.uri.withAuthority("gitlab.com", 443)))
+      val request = context.request.withUri(context.request.uri.withAuthority(Constants.GITLAB_HOST, Constants.GITLAB_PORT).withScheme("https"))
+      LOG.info("Opening connection to " + request.uri.authority.host.address)
+      val flow = Http(actorSystem).outgoingConnectionHttps(Constants.GITLAB_HOST)
+      Source.single(request)
         .via(flow)
         .runWith(Sink.head)
         .flatMap(r => context.complete(r))

@@ -10,6 +10,9 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.reinno.gitlab.api.proxy.route.ApiRouterService
+import com.reinno.gitlab.api.proxy.util.Constants
+
+import scala.language.postfixOps
 
 object Boot extends App {
   // we need an ActorSystem to host our application in
@@ -19,8 +22,9 @@ object Boot extends App {
   implicit val mat = ActorMaterializer()
   val service = new ApiRouterService(system, mat)
 
-  val bindFuture = Http().bindAndHandle(Route.handlerFlow(service.route), "0.0.0.0", 8001)
-  Await.result(bindFuture, 15 seconds)
+  val bindFuture = Http().bindAndHandle(Route.handlerFlow(service.route),
+    Constants.SERVER_HOST, Constants.SERVER_PORT)
 
+  Await.result(bindFuture, 15 seconds)
   Await.result(system.whenTerminated, Duration.Inf)
 }

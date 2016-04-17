@@ -1,9 +1,11 @@
 package com.reinno.gitlab.api.proxy
 
+import com.reinno.gitlab.api.proxy.service.ApiMaster
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-import akka.actor.ActorSystem
+import akka.actor.{Props, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 
@@ -19,8 +21,10 @@ object Boot extends App {
   implicit val system = ActorSystem("gitlab-api-proxy")
   implicit val timeout = Timeout(10 seconds)
 
+  val apiMaster = system.actorOf(Props[ApiMaster], "ApiMaster")
+
   implicit val mat = ActorMaterializer()
-  val service = new ApiRouterService(system, mat)
+  val service = new ApiRouterService(system, mat, apiMaster)
 
   val bindFuture = Http().bindAndHandle(Route.handlerFlow(service.route),
     Constants.SERVER_HOST, Constants.SERVER_PORT)

@@ -1,21 +1,31 @@
 package com.reinno.gitlab.api.proxy.route
 
-import akka.http.scaladsl.Http
-import akka.stream.scaladsl.{Sink, Source}
-import com.reinno.gitlab.api.proxy.util.{LogUtil, Constants}
-
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
+
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.{Sink, Source}
+
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 
+import com.reinno.gitlab.api.proxy.service.ApiMaster.GetProjectIssueNotesNum
+import com.reinno.gitlab.api.proxy.util.{LogUtil, Constants}
+import com.reinno.gitlab.api.proxy.util.ActorUtil._
+
+
+
 
 trait ApiRouter {
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   implicit val ec: ExecutionContext
   implicit val mat: ActorMaterializer
   val actorSystem: ActorSystem
+  val apiMaster: ActorRef
   val LOG = LogUtil.getLogger(getClass)
 
   protected def prefix = Slash ~ "api" / s"${Constants.REST_VERSION}"
@@ -23,7 +33,17 @@ trait ApiRouter {
   def serviceRouters: Route = encodeResponse {
     extractMaterializer {implicit mat =>
       rawPathPrefix(prefix) {
-        ???
+        pathPrefix("projects" / IntNumber) { projectId => {
+            path("issues" / "notes_num") {
+              onComplete(askActor[Int](apiMaster, GetProjectIssueNotesNum(projectId))) {
+                case Success(value) =>
+                  complete(s"issue_num: $value")
+                case Failure(ex) =>
+                  failWith(ex)
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -45,7 +65,8 @@ trait ApiRouter {
 }
 
 class ApiRouterService(val actorSystem: ActorSystem,
-                       val mat: ActorMaterializer)
+                       val mat: ActorMaterializer,
+                       val apiMaster: ActorRef)
   extends ApiRouter {
   implicit val ec: ExecutionContext = actorSystem.dispatcher
 }

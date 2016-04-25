@@ -60,7 +60,7 @@ trait ApiRouter {
   }
 
   def route: Route = {
-    transportRouters
+     serviceRouters ~ transportRouters
   }
 }
 

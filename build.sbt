@@ -12,7 +12,7 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
 
 libraryDependencies ++= {
   val akkaV = "2.4.3"
-  val sprayV = "1.3.3"
+  val json4sV = "3.3.0"
 
   Seq(
     "com.typesafe.akka"   %% "akka-actor"               % akkaV,
@@ -24,6 +24,11 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %% "akka-stream"              % akkaV,
     "com.typesafe.akka"   %% "akka-http-testkit"        % akkaV    % "test",
     "com.typesafe.akka"   %% "akka-http-spray-json-experimental" % akkaV,
+
+
+    "org.json4s"          %% "json4s-native"            % json4sV,
+    "org.json4s"          %% "json4s-jackson"           % json4sV,
+    "de.heikoseeberger"   %% "akka-http-json4s"         % "1.6.0",
 
     "org.iq80.leveldb"    %  "leveldb"                  % "0.7",
     "org.fusesource.leveldbjni" % "leveldbjni-all"      % "1.8",

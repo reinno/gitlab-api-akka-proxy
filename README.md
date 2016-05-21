@@ -1,5 +1,5 @@
 # Gitlab Api Akka Enhanced
-Use Akka to enhance Gitlab Api
+Use Akka(-HTTP) to enhance Gitlab Api
 
 # Status
 [![Build Status](https://travis-ci.org/reinno/gitlab-api-akka-proxy.svg)](https://travis-ci.org/reinno/gitlab-api-akka-proxy)

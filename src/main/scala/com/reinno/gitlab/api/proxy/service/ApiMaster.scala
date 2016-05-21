@@ -12,10 +12,10 @@ object ApiMaster {
   sealed trait ApiMasterSendMsg
   case object UnknownMsg extends ApiMasterSendMsg
 
-  def props(actorSystem: ActorSystem): Props = Props(new ApiMaster(actorSystem))
+  def props()(implicit httpClientItf: HttpClientSender): Props = Props(new ApiMaster())
 }
 
-class ApiMaster(actorSystem: ActorSystem) extends Actor with Stash with ActorLogging {
+class ApiMaster()(implicit val httpClient: HttpClientSender) extends BaseService with HttpClientService {
   import ApiMaster._
 
   override def receive: Receive = running

@@ -1,21 +1,21 @@
 package com.reinno.gitlab.api.proxy.route
 
-import com.reinno.gitlab.api.proxy.service.ApiMaster
+import akka.actor.ActorSystem
+import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
+import akka.stream.ActorMaterializer
+import com.reinno.gitlab.api.proxy.service.{ApiMaster, HttpClientSingle}
 import com.reinno.gitlab.api.proxy.util.LogUtil
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
 import scala.concurrent.duration._
-
-import akka.actor.{Props, ActorSystem}
-import akka.stream.ActorMaterializer
-import akka.http.scaladsl.testkit.{ScalatestRouteTest, RouteTestTimeout}
-
-import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
+import scala.language.postfixOps
 
 class ApiRouterServiceSpec extends FlatSpec with ScalatestRouteTest with Matchers with BeforeAndAfterAll {
   implicit def actorSystem: ActorSystem = system
   implicit val mat = ActorMaterializer()
+  implicit val httpClient = new HttpClientSingle()
   val LOG = LogUtil.getLogger(getClass)
-  val apiMaster = system.actorOf(ApiMaster.props(actorSystem), "ApiMaster")
+  val apiMaster = system.actorOf(ApiMaster.props(), "ApiMaster")
 
   it should "tranport transfer msg" in {
     val route = new ApiRouterService(system, mat, apiMaster).route

@@ -18,7 +18,7 @@
 
     <appender name="file"  class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>./director.logging.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>./api-proxy.logging.%d{yyyy-MM-dd}.log</FileNamePattern>
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
         <append>true</append>

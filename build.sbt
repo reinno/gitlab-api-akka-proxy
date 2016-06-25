@@ -60,6 +60,6 @@ packageOptions += Package.ManifestAttributes(
   "Class-Path" -> classPath.mkString(" ")
 )
 
-test in assembly := {}
+//test in assembly := {}
 
 Revolver.settings

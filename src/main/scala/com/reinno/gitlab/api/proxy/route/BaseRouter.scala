@@ -1,10 +1,10 @@
 package com.reinno.gitlab.api.proxy.route
 
-import akka.stream.Materializer
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-
-import com.reinno.gitlab.api.proxy.util.{LogUtil, Constants}
+import akka.http.scaladsl.server.Route
+import akka.stream.Materializer
+import com.reinno.gitlab.api.proxy.util.{Constants, LogUtil}
 
 trait BaseRouter {
 
@@ -17,6 +17,24 @@ trait BaseRouter {
       rawPathPrefix(prefix) {
         doRoute(mat)
       }
+    }
+  }
+}
+
+
+trait GitLabEnhanceRouter extends BaseRouter {
+
+  protected def doRouteWithToken(token: String)(implicit mat: Materializer): Route
+
+  override final def doRoute(implicit mat: Materializer): Route = {
+    extractRequest {
+      context =>
+        context.headers.find(_.name == "PRIVATE-TOKEN") match {
+          case Some(head) =>
+            doRouteWithToken(head.value)
+          case None =>
+            complete(HttpResponse(StatusCodes.Unauthorized))
+        }
     }
   }
 }

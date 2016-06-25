@@ -12,3 +12,12 @@ object BaseService {
 trait BaseService extends Actor with Stash with ActorLogging
 
 
+object GitLabEnhanceService {
+  sealed trait Msg {
+    val token: String
+  }
+
+  case class GetProjectIssueNotesNum(token: String, projectId: Int) extends Msg
+}
+
+

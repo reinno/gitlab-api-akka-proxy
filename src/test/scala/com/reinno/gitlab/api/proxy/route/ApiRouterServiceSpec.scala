@@ -39,4 +39,14 @@ class ApiRouterServiceSpec extends FlatSpec with ScalatestRouteTest with Matcher
       assert(status == StatusCodes.OK)
     }
   }
+
+  it should "fail without token" in {
+    val route = new ApiRouterService(system, apiMaster).route
+    implicit val customTimeout = RouteTestTimeout(15 seconds)
+
+    Get(s"/api/v3/projects/123/issues/notes_num") ~> route ~> check {
+      LOG.info(responseAs[String])
+      assert(status == StatusCodes.Unauthorized)
+    }
+  }
 }

@@ -24,7 +24,7 @@ object Boot extends App {
   val apiMaster = system.actorOf(Props[ApiMaster], "ApiMaster")
 
   implicit val mat = ActorMaterializer()
-  val service = new ApiRouterService(system, mat, apiMaster)
+  val service = new ApiRouterService(system, apiMaster)
 
 
   val bindFuture = Http().bindAndHandle(Route.handlerFlow(service.route),

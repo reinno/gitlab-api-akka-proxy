@@ -9,9 +9,9 @@ import akka.http.scaladsl.server.Route
 
 import com.reinno.gitlab.api.proxy.util.Constants
 
-class TransportRoute(actorSystem: ActorSystem) extends BaseRouter {
-  import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
+class TransparentRoute(actorSystem: ActorSystem)(implicit ec: ExecutionContext) extends BaseRouter {
   override def doRoute(implicit mat: Materializer): Route = {
     context =>
       val request = context.request.withUri(context.request.uri.withAuthority(Constants.GITLAB_HOST, Constants.GITLAB_PORT).withScheme("https"))
